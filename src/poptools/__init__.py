@@ -12,3 +12,7 @@ where $g_0, g_1, \\dots, g_m$ are real polynomials in $\\mathbb{R}[\\mathbf x]$,
 While they are generally very hard to solve due to their non-convex nature, 
 POPs offer a powerful language for modeling a huge variety of problems throughout mathematics and applications.
 """
+
+from poptools import linalg
+
+__all__ = ["linalg"]
