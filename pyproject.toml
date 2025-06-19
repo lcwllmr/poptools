@@ -4,8 +4,8 @@ version = "2025.6.17"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "numpy==2.3.0",
-    "scipy==1.15.3",
+    "numpy>=2.3",
+    "scipy>=1.15",
 ]
 
 [build-system]
@@ -15,5 +15,5 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "pdoc3>=0.11.6",
-    "scipy-stubs>=1.15.3.0",
+    "scipy-stubs>=1.16"
 ]
