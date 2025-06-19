@@ -24,6 +24,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version-file: "pyproject.toml"
+      - name: set up project environment
+        run: uv sync
       - name: run doctests
         run: make doctest
       - name: build documentation
