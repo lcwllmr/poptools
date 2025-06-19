@@ -13,6 +13,6 @@ While they are generally very hard to solve due to their non-convex nature,
 POPs offer a powerful language for modeling a huge variety of problems throughout mathematics and applications.
 """
 
-from poptools import linalg
+from poptools import linalg, opt
 
-__all__ = ["linalg"]
+__all__ = ["linalg", "opt"]
