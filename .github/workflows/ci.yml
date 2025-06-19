@@ -8,29 +8,26 @@ on:
 
 jobs:
   ci:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
-
       - name: set up uv
         uses: astral-sh/setup-uv@v5
-      
       - name: install python
         uses: actions/setup-python@v5
         with:
           python-version-file: "pyproject.toml"
-      
       - name: run doctests
         run: make doctest
-
       - name: build documentation
         run: make docs
-
+      - name: upload documentation artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
       - name: deploy to gh-pages
         uses: actions/deploy-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
-          publish_branch: gh-pages
-          force_orphan: true
