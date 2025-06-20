@@ -1,8 +1,8 @@
 PDOC_CFG= -c sort_identifiers=False -c latex_math=True -c show_source_code=False
 
-.PHONY: doctest
-doctest:
-	find src/poptools -name '*.py' -not -path '*/__pycache__/*' | xargs -i uv run -m doctest {}
+.PHONY: test
+test:
+	uv run pytest --doctest-modules
 
 .PHONY: live-docs
 live-docs:

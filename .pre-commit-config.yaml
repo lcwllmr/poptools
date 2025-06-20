@@ -11,9 +11,9 @@ repos:
   - id: ruff-format
 - repo: local
   hooks:
-  - id: doctest
-    name: run doctest on all files
-    entry: make doctest
+  - id: test
+    name: run all tests
+    entry: make test
     language: system
     pass_filenames: false
 

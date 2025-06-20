@@ -27,7 +27,7 @@ jobs:
       - name: set up project environment
         run: uv sync
       - name: run doctests
-        run: make doctest
+        run: make test
       - name: build documentation
         run: make docs
       - name: upload documentation artifacts
