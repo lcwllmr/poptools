@@ -56,14 +56,13 @@ class SemidefiniteProgram:
             )
         self.b = b
         self.opt_sense = opt_sense
-        self.primal_objective_sign = 1.0 if self.opt_sense == "max" else -1.0
-        self.dual_objective_sign = -self.primal_objective_sign
+        self.objective_sign = 1.0 if self.opt_sense == "max" else -1.0
 
     def primal_objective(self, x: np.ndarray) -> np.ndarray:
         """
         Computes the primal objective function value `< a[0], x >` for a given vectorized symmetric matrix x (in the same `vsd`).
         """
-        return self.primal_objective_sign * self.vsd.frobenius(self.a[0], x)
+        return self.objective_sign * self.vsd.frobenius(self.a[0], x)
 
     def dual_objective(self, y: np.ndarray) -> np.ndarray:
         """
@@ -73,7 +72,7 @@ class SemidefiniteProgram:
             raise ValueError(
                 "y must be a 1D array with shape (m,) where m is the number of constraints."
             )
-        return self.dual_objective_sign * np.dot(self.b, y)
+        return self.objective_sign * np.dot(self.b, y)
 
     def bounds(self, x: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         if self.opt_sense == "max":
@@ -87,7 +86,7 @@ class SemidefiniteProgram:
 
     def opA(self, x: np.ndarray) -> np.ndarray:
         """
-        Evaluates the constraint operator A, which maps the symmetric part of a vectorized symmetric matrix `x` to an `m`-vector.
+        Evaluates the constraint operator A, which maps a vectorized symmetric matrix `x` to an `m`-vector.
         ```
         opA(X) = [< A[i], X > for i = 1, ..., m]
         ```
@@ -128,7 +127,7 @@ class SemidefiniteProgram:
         pinfeas(X) = || opA(X) - b ||
         ```
         """
-        return np.linalg.norm(self.opA(X) - self.b)
+        return np.linalg.norm(self.opA(X) - self.b) / (1.0 + np.linalg.norm(self.b))
 
     def dual_infeasibility(self, y: np.ndarray, z: np.ndarray) -> np.ndarray:
         """
@@ -138,8 +137,6 @@ class SemidefiniteProgram:
         ```
         where `adA(y)` is the evaluation of the adjoint of the constraint operator A at y.
         """
-        if z.ndim != 2 or z.shape[0] != self.n or z.shape[1] != self.n:
-            raise ValueError(
-                "Z must be a 2D array with shape (n, n) where n is the size of the matrices."
-            )
-        return np.sqrt(self.vsd.frobenius(self.adA(y) - self.a[0] - z))
+        return np.sqrt(self.vsd.frobenius(self.adA(y) - self.a[0] - z)) / (
+            1.0 + np.sqrt(self.vsd.frobenius(self.a[0]))
+        )
