@@ -26,7 +26,7 @@ jobs:
           python-version-file: "pyproject.toml"
       - name: set up project environment
         run: uv sync
-      - name: run doctests
+      - name: run tests
         run: make test
       - name: build documentation
         run: make docs
