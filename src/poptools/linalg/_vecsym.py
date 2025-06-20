@@ -53,7 +53,7 @@ class VecSymDomain:
         Symmetrizes the input matrix (or stack of matrices) `a` by averaging it with its transpose, and returns it vectorized.
         """
         # TODO: do checks
-        return self.vectorize(0.5 * (a + a.transpose(-1, -2)))
+        return self.vectorize(0.5 * (a + a.transpose(*range(len(a.shape) - 2), -1, -2)))
 
     def unvectorize(self, vec: np.ndarray) -> np.ndarray:
         """
