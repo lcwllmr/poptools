@@ -5,7 +5,7 @@ from poptools.random import maxcut
 
 if __name__ == "__main__":
     np.random.seed(0)
-    sdp = maxcut(50, 0.1)
+    sdp = maxcut(500, 0.1)
 
     n = sdp.n
     m = sdp.m
@@ -22,25 +22,30 @@ if __name__ == "__main__":
     y = np.zeros(m)
     z = dscale * np.eye(n)
 
-    lz = sp.linalg.cholesky(z, lower=True)
+    lz = np.sqrt(dscale) * np.eye(n)  # = sp.linalg.cholesky(z, lower=True)
 
     it = 0
     mu = vsd.frobenius(vsd.vectorize(x), vsd.vectorize(z)) / (2.0 * n)
     print(f"Initialized solver for an SDP of matrix dimension {n} with {m} constraints")
 
-    def log_state():
+    def log_state() -> bool:
         pobj = sdp.primal_objective(vsd.project(x))
         dobj = sdp.dual_objective(y)
-        gap = dobj - pobj
+        relgap = sdp.relative_gap(vsd.project(x), y)
         pinfeas = sdp.primal_infeasibility(vsd.vectorize(x))
         dinfeas = sdp.dual_infeasibility(y, vsd.vectorize(z))
         print(
-            f"it={it}, mu={mu:.3g}, gap={gap:.3g}, lower={pobj:3g}, upper={dobj:3g}, pinfeas={pinfeas:3g}, dinfeas={dinfeas:3g}"
+            f"it={it}, mu={mu:.3g}, relgap={relgap:.3g}, lower={pobj:3g}, upper={dobj:3g}, pinfeas={pinfeas:3g}, dinfeas={dinfeas:3g}"
         )
+
+        if dinfeas < 1e-7 and pinfeas < 1e-7 and relgap < 1e-7:
+            return True
+        else:
+            return False
 
     log_state()
 
-    while it < 20:
+    while True:
         it += 1
 
         # precompute inverse of dual variable Z
@@ -96,4 +101,9 @@ if __name__ == "__main__":
         lz = sp.linalg.cholesky(z, lower=True)
         mu = vsd.frobenius(vsd.vectorize(x), vsd.vectorize(z)) / (2.0 * n)
 
-        log_state()
+        if log_state():
+            break
+
+    print("stopping")
+    bounds = sdp.bounds(vsd.project(x), y)
+    print("objective", (bounds[1] + bounds[0]) / 2.0)

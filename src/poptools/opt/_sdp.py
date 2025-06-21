@@ -140,3 +140,7 @@ class SemidefiniteProgram:
         return np.sqrt(self.vsd.frobenius(self.adA(y) - self.a[0] - z)) / (
             1.0 + np.sqrt(self.vsd.frobenius(self.a[0]))
         )
+
+    def relative_gap(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        dobj = self.dual_objective(y)
+        return np.abs(self.primal_objective(x) - dobj) / (1.0 + np.abs(dobj))
