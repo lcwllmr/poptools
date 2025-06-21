@@ -5,7 +5,7 @@ from poptools.random import maxcut
 
 if __name__ == "__main__":
     np.random.seed(0)
-    sdp = maxcut(500, 0.1)
+    sdp = maxcut(10, 0.1)
 
     n = sdp.n
     m = sdp.m
@@ -53,29 +53,24 @@ if __name__ == "__main__":
         zinv = lz_inv.T @ lz_inv
 
         # build and factor newton system
-        system_matrix = sdp.opA(
-            vsd.project(zinv @ vsd.unvectorize(sdp.adA(np.eye(m))) @ x)
-        )
+        system_matrix = sdp.opA(vsd.matmul_project(zinv, sdp.adA(np.eye(m)), x))
         system_matrix_chol = sp.linalg.cho_factor(system_matrix)
 
         # predictor step
         fd = vsd.vectorize(z) + sdp.a[0] - sdp.adA(y)
-        zinv_fd_x = vsd.project(zinv @ vsd.unvectorize(fd) @ x)
+        zinv_fd_x = vsd.matmul_project(zinv, fd, x)
         pred_rhs = sdp.opA(zinv_fd_x) - sdp.b
         dy_pred = sp.linalg.cho_solve(system_matrix_chol, pred_rhs)
         adA_y_pred = sdp.adA(dy_pred)
-        dx_pred = zinv_fd_x - vsd.project(x + (zinv @ vsd.unvectorize(adA_y_pred) @ x))
+        dx_pred = zinv_fd_x - vsd.vectorize(x) - vsd.matmul_project(zinv, adA_y_pred, x)
         dz_pred = -fd + adA_y_pred
 
         # corrector step
-        tmp = vsd.project(
-            zinv
-            @ (mu * np.eye(n) - vsd.unvectorize(dz_pred) @ vsd.unvectorize(dx_pred))
-        )
+        tmp = vsd.project(mu * zinv) - vsd.matmul_project(zinv, dz_pred, dx_pred)
         corr_rhs = sdp.opA(tmp)
         dy_corr = sp.linalg.cho_solve(system_matrix_chol, corr_rhs)
         dz_corr = sdp.adA(dy_corr)
-        dx_corr = tmp - vsd.project(zinv @ vsd.unvectorize(dz_corr) @ x)
+        dx_corr = tmp - vsd.matmul_project(zinv, dz_corr, x)
 
         # compute final directions
         dx = dx_pred + dx_corr

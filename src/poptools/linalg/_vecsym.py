@@ -77,3 +77,20 @@ class VecSymDomain:
             return 2.0 * np.sum(veca**2, axis=-1)
         else:
             return 2.0 * np.tensordot(veca, vecb, axes=(-1, -1))
+
+    def matmul_project(self, *vecsymmats_or_mats: np.ndarray) -> np.ndarray:
+        """
+        Multiplies the matrices using standard matrix multiplication, and then projects the result to the vectorized symmetric matrix space.
+        The matrices can be either vectorized symmetric matrices or regular matrices, and the decision is made based on their shapes.
+        This is somewhat similar to the Jordan product `0.5 * (a @ b + b @ a)` but for multiple matrices.
+        """
+        # TODO: do checks
+        accum = vecsymmats_or_mats[0]
+        for a in vecsymmats_or_mats[1:]:
+            if a.shape[-2:] == (self.n, self.n):
+                # a is a regular matrix
+                accum = np.matmul(accum, a)
+            else:
+                # a is a vectorized symmetric matrix
+                accum = np.matmul(accum, self.unvectorize(a))
+        return self.project(accum)
