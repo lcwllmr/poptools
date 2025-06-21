@@ -13,4 +13,4 @@ To get an overview over current set of features check out the [docs](https://lcw
 I develop the core library as needed by the particular algorithms or methods from the literature that I'm interested in.
 Each item in the following list corresponds to one such showcase in the `examples/` directory.
 
-- **[WIP]** [`bad-csdp-clone`](examples/bad-csdp-clone/): This is a simple re-implementation of [gh:coin-or/Csdp](https://github.com/coin-or/Csdp) with focus lies on code readability. The solver comes with a nice CLI and is also used in other examples.
+- **[WIP]** [`bad-csdp-clone`](examples/bad-csdp-clone/): This is a simple re-implementation of [gh:coin-or/Csdp](https://github.com/coin-or/Csdp) with focus on code readability. The solver comes with a nice CLI and is also used in other examples.
