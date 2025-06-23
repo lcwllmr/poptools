@@ -1,4 +1,3 @@
-from typing import Tuple, Literal
 import numpy as np
 from poptools.linalg import VecSymDomain
 
@@ -13,11 +12,10 @@ class SemidefiniteProgram:
     - `vsd` : a `VecSymDomain` object representing the domain of symmetric matrices,
     - `a` : array of vectorized symmetric matrices of shape (m + 1, n * (n + 1) / 2),
     - `b` : vector of shape (m,), and
-    - `opt_sense` : optimization sense of the primal, either 'max' or 'min'.
 
     The primal SDP reads as follows:
     ```text
-    max/min     < a[0], x >
+    maximize    < a[0], x >
     over        x symmetric, PSD matrix of size n x n
     subject to  < a[i], x > = b[i] for i = 1, ..., m
     ```
@@ -31,13 +29,7 @@ class SemidefiniteProgram:
     ```
     """
 
-    def __init__(
-        self,
-        vsd: VecSymDomain,
-        a: np.ndarray,
-        b: np.ndarray,
-        opt_sense: Literal["max", "min"] = "max",
-    ):
+    def __init__(self, vsd: VecSymDomain, a: np.ndarray, b: np.ndarray):
         self.vsd = vsd
         if a.ndim != 2 or a.shape[1] != self.vsd.dim:
             raise ValueError(
@@ -55,14 +47,12 @@ class SemidefiniteProgram:
                 "b must be a 1D array with shape (m,) where m is the number of constraints."
             )
         self.b = b
-        self.opt_sense = opt_sense
-        self.objective_sign = 1.0 if self.opt_sense == "max" else -1.0
 
     def primal_objective(self, x: np.ndarray) -> np.ndarray:
         """
         Computes the primal objective function value `< a[0], x >` for a given vectorized symmetric matrix x (in the same `vsd`).
         """
-        return self.objective_sign * self.vsd.frobenius(self.a[0], x)
+        return self.vsd.frobenius(self.a[0], x)
 
     def dual_objective(self, y: np.ndarray) -> np.ndarray:
         """
@@ -72,16 +62,11 @@ class SemidefiniteProgram:
             raise ValueError(
                 "y must be a 1D array with shape (m,) where m is the number of constraints."
             )
-        return self.objective_sign * np.dot(self.b, y)
+        return np.dot(self.b, y)
 
-    def bounds(self, x: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        if self.opt_sense == "max":
-            lower = self.primal_objective(x)
-            upper = self.dual_objective(y)
-        else:
-            assert self.opt_sense == "min"
-            lower = self.dual_objective(y)
-            upper = self.primal_objective(x)
+    def bounds(self, x: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        lower = self.primal_objective(x)
+        upper = self.dual_objective(y)
         return lower, upper
 
     def opA(self, x: np.ndarray) -> np.ndarray:
