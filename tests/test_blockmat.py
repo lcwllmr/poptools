@@ -1,5 +1,12 @@
 import numpy as np
-from poptools.linalg import BlockMatArray, BlockStructure, frobenius
+from poptools.linalg import (
+    BlockMatArray,
+    BlockStructure,
+    frobenius,
+    maxeigsh,
+    cho_factor,
+    cho_solve,
+)
 
 
 def test_zero():
@@ -92,6 +99,17 @@ def test_frobenius_norm():
     assert np.allclose(f, np.sqrt(6))
 
 
+def test_frobenius_inner_product_1d_nd():
+    s: BlockStructure = [("dense", 3), ("dense", 3)]
+    a = BlockMatArray.identity(5, s)
+    assert a.shape == (5, 6, 6)
+    b = BlockMatArray.identity(1, s)
+    assert b.shape == (1, 6, 6)
+    f = frobenius(a, b)
+    assert f.shape == (5, 1)
+    assert np.allclose(f, 6)
+
+
 def test_frobenius_inner_product():
     s: BlockStructure = [("diagonal", 2), ("dense", 4)]
     a = BlockMatArray.identity(4, s)
@@ -99,3 +117,29 @@ def test_frobenius_inner_product():
     f = frobenius(a, b)
     assert f.shape == (4, 2)
     assert np.allclose(f, 6)
+
+
+def test_maxeig():
+    s: BlockStructure = [("dense", 2), ("dense", 3)]
+    a = 5 * BlockMatArray.identity(1, s)
+    eig = maxeigsh(a)
+    assert np.isclose(eig, 5)
+
+
+def test_cholesky():
+    r = np.random.normal(size=(1, 5, 5))
+    s = BlockStructure([("dense", 5)])
+    a = BlockMatArray(s, [r])
+    a = a.T @ a
+    assert a.shape == (1, 5, 5)
+
+    ll = cho_factor(a)
+    linv = cho_solve(ll, BlockMatArray.identity(1, s))
+    assert linv.shape == (1, 5, 5)
+    assert np.allclose(linv.dense(), np.linalg.inv(ll.dense()))
+    assert np.allclose((linv @ ll).dense(), np.eye(5))
+
+    ainv = linv.T @ linv
+    assert ainv.shape == (1, 5, 5)
+    assert np.allclose(ainv.dense(), np.linalg.inv(a.dense()))
+    assert np.allclose((ainv @ a).dense(), np.eye(5))
