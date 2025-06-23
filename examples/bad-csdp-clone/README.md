@@ -15,7 +15,7 @@ Main additions of the implementation over the basic idea are:
 As of right now, this is just a very rough (but working) implementation.
 Next steps:
 
-- extend the `VecSymDomain` class by smarter Jordan multiplication, and block-structured matrices
+- add support for sparse blocks - `scipy` unfortunately is not great currently, but [pydata/sparse](https://sparse.pydata.org/en/stable/) looks promising because they support higher-order sparse tensors
 - go through the main solver file of CSDP and implement all the rules for detecting infeasibility etc.
 - measure timings of the various operations per iteration
 - add a nice CLI to make it available to other examples
