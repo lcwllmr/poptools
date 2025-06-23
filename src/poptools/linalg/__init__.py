@@ -1,4 +1,11 @@
 from poptools.linalg._vecsym import VecSymDomain
 from poptools.linalg._psdcone import posdef_linesearch
+from poptools.linalg._blockmat import BlockMatArray, BlockStructure, frobenius
 
-__all__ = ["VecSymDomain", "posdef_linesearch"]
+__all__ = [
+    "VecSymDomain",
+    "posdef_linesearch",
+    "BlockMatArray",
+    "BlockStructure",
+    "frobenius",
+]
