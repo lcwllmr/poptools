@@ -16,5 +16,11 @@ build-backend = "hatchling.build"
 dev = [
     "pdoc3>=0.11.6",
     "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
     "scipy-stubs>=1.16",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
 ]
