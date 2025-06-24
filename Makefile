@@ -15,6 +15,12 @@ docs:
 	mv docs/poptools/* docs/
 	rmdir docs/poptools
 
+.PHONY: badges
+badges:
+	mkdir -p docs/badges
+	COVERAGE=$$(uvx coverage report | grep '^TOTAL' | awk '{print $$NF}' | sed 's/%/%25/'); \
+	curl -o docs/badges/coverage.svg https://img.shields.io/badge/coverage-$$COVERAGE-brightgreen
+
 .PHONY: clean
 clean:
 	find . -name '__pycache__' -type d -exec rm -rf {} +

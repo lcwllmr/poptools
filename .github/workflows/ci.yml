@@ -30,6 +30,8 @@ jobs:
         run: make test
       - name: build documentation
         run: make docs
+      - name: build badges
+        run: make badges
       - name: upload documentation artifacts
         uses: actions/upload-pages-artifact@v3
         with:
