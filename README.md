@@ -1,6 +1,7 @@
 # `poptools`: Toolbox for polynomial optimization research
 
 [![ci](https://github.com/lcwllmr/poptools/actions/workflows/ci.yml/badge.svg)](https://github.com/lcwllmr/poptools/actions/workflows/ci.yml)
+![coverage](https://lcwllmr.github.io/poptools/badges/coverage.svg)
 
 This Python package provides various ingredients for research in polynomial optimization.
 The leading design principle is providing just the right set of tools to quickly and intuitively sketch algorithms and perform experiments.
