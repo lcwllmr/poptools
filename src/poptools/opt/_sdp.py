@@ -1,5 +1,5 @@
 import numpy as np
-from poptools.linalg import BlockMatArray, frobenius, MatrixBlockType
+from poptools.linalg import BlockMatArray, frobenius
 
 
 class SemidefiniteProgram:
@@ -91,7 +91,7 @@ class SemidefiniteProgram:
                 "y must be a array with last dimension equal to m - the number of constraints."
             )
 
-        blocks: list[MatrixBlockType] = []
+        blocks: list[np.ndarray] = []
         for block in self.a.blocks:
             blocks.append(np.tensordot(y, block, axes=([0], [0])))
         return BlockMatArray(self.block_structure, blocks)
