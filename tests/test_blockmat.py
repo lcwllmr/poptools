@@ -45,6 +45,15 @@ def test_identity():
     assert np.allclose(d[2], np.eye(9))
 
 
+def test_diag():
+    s: BlockStructure = [("diagonal", 2), ("dense", 3)]
+    a = BlockMatArray.diagonal(4, s, np.arange(5))
+    assert a.shape == (4, 5, 5)
+    assert a.structure == s
+    d = a.dense()
+    assert np.allclose(d, np.diag(np.arange(5)))
+
+
 def test_add():
     s: BlockStructure = [("dense", 2), ("dense", 3)]
     a = BlockMatArray.identity(2, s) + BlockMatArray.identity(2, s)
@@ -117,6 +126,41 @@ def test_frobenius_inner_product():
     f = frobenius(a, b)
     assert f.shape == (4, 2)
     assert np.allclose(f, 6)
+
+
+def test_frobenius_inner_product_random():
+    s: BlockStructure = [("dense", 3), ("diagonal", 3)]
+    a = BlockMatArray(
+        s,
+        [
+            np.random.normal(size=(1, 3, 3)),
+            np.random.normal(
+                size=(
+                    1,
+                    3,
+                )
+            ),
+        ],
+    )
+    b = BlockMatArray(
+        s,
+        [
+            np.random.normal(size=(1, 3, 3)),
+            np.random.normal(
+                size=(
+                    1,
+                    3,
+                )
+            ),
+        ],
+    )
+    f = frobenius(a, b)
+    assert f.shape == (1, 1)
+    ad = a.dense()
+    bd = b.dense()
+    assert ad.shape == (1, 6, 6)
+    assert ad.shape == bd.shape
+    assert np.isclose(f[0, 0], np.sum(ad[0] * bd[0]))
 
 
 def test_maxeig():

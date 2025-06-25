@@ -181,6 +181,36 @@ class BlockMatArray:
         return BlockMatArray(s, out_blocks)
 
     @staticmethod
+    def diagonal(
+        stack_size: int, s: BlockStructure, values: np.ndarray
+    ) -> "BlockMatArray":
+        """
+        Creates a block diagonal matrix with given values in the diagonal blocks.
+        The values should be a 1D array with the same length as the number of blocks.
+        """
+        assert values.ndim == 1, "Values must be a 1D array."
+        assert values.size == sum(n for _, n in s), (
+            "Length of values must match the number of blocks."
+        )
+        out_blocks: list[MatrixBlockType] = []
+        offset = 0
+        for t, n in s:
+            values_part = values[offset : offset + n]
+            if t == "dense":
+                block = np.zeros((stack_size, n, n), dtype=np.float64)
+                for i in range(stack_size):
+                    block[i, np.arange(n), np.arange(n)] = values_part
+                out_blocks.append(block)
+            else:
+                assert t == "diagonal"
+                block = np.zeros((stack_size, n), dtype=np.float64)
+                for i in range(stack_size):
+                    block[i, :] = values_part
+                out_blocks.append(block)
+            offset += n
+        return BlockMatArray(s, out_blocks)
+
+    @staticmethod
     def stack(*bmas: "BlockMatArray") -> "BlockMatArray":
         s = bmas[0].structure
         blocks = [
@@ -199,10 +229,9 @@ def frobenius(a: BlockMatArray, b: BlockMatArray | None = None) -> np.ndarray:
         accum = np.zeros(a.shape[0])
         for block in a.blocks:
             if block.ndim == 2:
-                accum += np.sum(block**2, axis=1)
+                accum += np.sum(block**2, axis=(1,))
             elif block.ndim == 3:
                 accum += np.sum(block**2, axis=(1, 2))
-        assert accum.ndim <= 1
         return accum
     else:
         if not are_block_structures_compatible(a.structure, b.structure):
@@ -223,7 +252,6 @@ def frobenius(a: BlockMatArray, b: BlockMatArray | None = None) -> np.ndarray:
                 raise ValueError(
                     f"Incompatible block types for Frobenius inner product: '{t1}' and '{t2}'"
                 )
-        assert accum.ndim <= 2
         return accum
 
 
@@ -277,7 +305,7 @@ def maxeigsh(x: BlockMatArray) -> float:
             )
         else:
             assert kind == "diagonal"
-            block_max = np.max(np.abs(block[0, :]))
+            block_max = np.max(block[0, :])
         curmax = max(curmax, block_max)
     assert curmax != -np.inf
     return curmax
