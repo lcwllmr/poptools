@@ -96,14 +96,18 @@ class SemidefiniteProgram:
             blocks.append(np.tensordot(y, block, axes=([0], [0])))
         return BlockMatArray(self.block_structure, blocks)
 
-    def primal_infeasibility(self, x: BlockMatArray) -> np.floating:
+    def primal_infeasibility(self, x: BlockMatArray) -> float:
         """
-        Computes the primal infeasibility, which is defined as the 2-norm of the residual of the constraints:
+        Computes the (relative) primal infeasibility, which is defined as
         ```
-        pinfeas(X) = || opA(X) - b ||
+        || opA(X) - b || / ( 1 + || b || )
         ```
         """
-        return np.linalg.norm(self.opA(x) - self.b) / (1.0 + np.linalg.norm(self.b))
+        if x.shape[0] != 1:
+            raise ValueError("Input must be a single matrix.")
+        return float(
+            np.linalg.norm(self.opA(x)[:, 0] - self.b) / (1.0 + np.linalg.norm(self.b))
+        )
 
     def dual_infeasibility(self, y: np.ndarray, z: BlockMatArray) -> np.ndarray:
         """
