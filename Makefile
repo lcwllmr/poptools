@@ -24,4 +24,8 @@ badges:
 .PHONY: clean
 clean:
 	find . -name '__pycache__' -type d -exec rm -rf {} +
-	rm -rf ./docs/
+	rm -rf docs/
+	rm -rf .pytest_cache/
+	rm -rf .ruff_cache/
+	rm -rf .coverage
+	rm -rf .venv/
