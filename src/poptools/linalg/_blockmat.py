@@ -219,6 +219,13 @@ class BlockMatArray:
         return BlockMatArray(s, blocks)
 
 
+def symmetric_part(x: BlockMatArray) -> BlockMatArray:
+    """
+    Returns the average of the block matrix and its transpose.
+    """
+    return 0.5 * (x + x.T)
+
+
 def frobenius(a: BlockMatArray, b: BlockMatArray | None = None) -> np.ndarray:
     """
     Computes the Frobenius inner product of two block matrix arrays.

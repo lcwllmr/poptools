@@ -3,9 +3,10 @@ from poptools.linalg import (
     BlockMatArray,
     BlockStructure,
     frobenius,
-    maxeigsh,
     cho_factor,
     cho_solve,
+    maxeigsh,
+    symmetric_part,
 )
 
 
@@ -98,6 +99,18 @@ def test_matmul_threefold_broadcast():
     d = a @ b @ c
     assert d.shape == (5, 6, 6)
     assert np.allclose(d.dense(), 20 * np.eye(6))
+
+
+def test_symmetric_part():
+    s: BlockStructure = [("dense", 3), ("diagonal", 2)]
+    a = BlockMatArray.identity(2, s)
+    a.blocks[0][0, :, :] = np.random.normal(size=(3, 3))
+    a.blocks[0][1, :, :] = np.random.normal(size=(3, 3))
+
+    ad = symmetric_part(a).dense()
+    assert ad.shape == a.shape
+    assert np.allclose(ad[0], ad[0].T)
+    assert np.allclose(ad[1], ad[1].T)
 
 
 def test_frobenius_norm():

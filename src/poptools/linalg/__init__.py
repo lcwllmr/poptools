@@ -7,6 +7,7 @@ from poptools.linalg._blockmat import (
     cho_factor,
     cho_solve,
     maxeigsh,
+    symmetric_part,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "cho_factor",
     "cho_solve",
     "maxeigsh",
+    "symmetric_part",
 ]
