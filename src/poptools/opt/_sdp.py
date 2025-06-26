@@ -62,11 +62,6 @@ class SemidefiniteProgram:
             )
         return np.dot(self.b, y)
 
-    def bounds(self, x: BlockMatArray, y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        lower = self.primal_objective(x)
-        upper = self.dual_objective(y)
-        return lower, upper
-
     def opA(self, x: BlockMatArray) -> np.ndarray:
         """
         Evaluates the constraint operator A, which maps a vectorized symmetric matrix `x` to an `m`-vector.
