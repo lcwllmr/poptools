@@ -4,6 +4,11 @@ PDOC_CFG= -c sort_identifiers=False -c latex_math=True -c show_source_code=False
 test:
 	uv run -m pytest --cov=poptools --doctest-modules
 
+.PHONY: htmlcov
+htmlcov:
+	uvx coverage html
+	xdg-open htmlcov/index.html 
+
 .PHONY: live-docs
 live-docs:
 	uv run pdoc $(PDOC_CFG) --http :8000 poptools
